@@ -17,5 +17,4 @@ func TestWelcome(t *testing.T) {
 	// verify
 	verify.Assert(t, responseRecorder.Code == 200, fmt.Sprintf("Status code is %d\n", responseRecorder.Code))
 	verify.Assert(t, responseRecorder.Body.String() == "Hello, World!", fmt.Sprintf("Body is %s\n", responseRecorder.Body.String()))
-
 }
