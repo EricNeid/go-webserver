@@ -1,16 +1,14 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"time"
-)
 
-const timeFormat string = "Mon Jan 2 15:04:05 2006"
+	"github.com/EricNeid/go-webserver/server"
+)
 
 var (
 	listenAddr string
@@ -27,8 +25,8 @@ func main() {
 
 	signal.Notify(quit, os.Interrupt)
 
-	server := newWebserver(logger)
-	go gracefullShutdown(server, logger, quit, done)
+	server := server.NewApplicationServer(logger, listenAddr)
+	go server.GracefullShutdown(quit, done)
 
 	logger.Println("Server is ready to handle requests at", listenAddr)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -37,43 +35,4 @@ func main() {
 
 	<-done
 	logger.Println("Server stopped")
-}
-
-func gracefullShutdown(server *http.Server, logger *log.Logger, quit <-chan os.Signal, done chan<- bool) {
-	<-quit
-	logger.Println("Server is shutting down...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	server.SetKeepAlivesEnabled(false)
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Fatalf("Could not gracefully shutdown the server: %v\n", err)
-	}
-	close(done)
-}
-
-func newWebserver(logger *log.Logger) *http.Server {
-	router := http.NewServeMux()
-	router.HandleFunc("/", logCall(logger, func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Hello, World!"))
-	}))
-
-	return &http.Server{
-		Addr:         listenAddr,
-		Handler:      router,
-		ErrorLog:     logger,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
-	}
-}
-
-func logCall(logger *log.Logger, handler func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		timestamp := time.Now()
-		logger.Printf("%s - %s\n", timestamp.Format(timeFormat), r.URL.Path)
-		handler(w, r)
-	}
 }
