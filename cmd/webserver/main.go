@@ -11,12 +11,24 @@ import (
 )
 
 var (
-	listenAddr string
+	listenAddr string = ":5000"
 )
 
-func main() {
-	flag.StringVar(&listenAddr, "listen-addr", ":5000", "server listen address")
+func readEnvironmentVariables() {
+	value, isSet := os.LookupEnv("LISTEN_ADDR")
+	if isSet {
+		listenAddr = value
+	}
+}
+
+func readCli() {
+	flag.StringVar(&listenAddr, "listen-addr", listenAddr, "server listen address")
 	flag.Parse()
+}
+
+func main() {
+	readEnvironmentVariables()
+	readCli()
 
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
 
