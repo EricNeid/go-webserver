@@ -2,3 +2,4 @@ out/
 **__debug_bin**
 .vscode/launch.json
 *.exe
+log/
