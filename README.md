@@ -1,3 +1,7 @@
+<!--
+SPDX-FileCopyrightText: 2021 Eric Neidhardt
+SPDX-License-Identifier: CC-BY-4.0
+-->
 <!-- markdownlint-disable MD041-->
 [![Go Report Card](https://goreportcard.com/badge/github.com/EricNeid/go-webserver?style=flat-square)](https://goreportcard.com/report/github.com/EricNeid/go-webserver)
 ![Go](https://github.com/EricNeid/go-webserver/workflows/Go/badge.svg)
