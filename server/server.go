@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2021 Eric Neidhardt
 // SPDX-License-Identifier: MIT
+
+// Package server contains webserver with gracefull shutdown functions and logger.
 package server
 
 import (
