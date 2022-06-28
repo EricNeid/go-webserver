@@ -10,19 +10,21 @@ import (
 
 const timeFormat string = "Mon Jan 2 15:04:05 2006"
 
+// A ApplicationServer defines parameters and companions for running an HTTP server.
 type ApplicationServer struct {
 	Webserver *http.Server
 	Logger    *log.Logger
 }
 
-func NewApplicationServer(logger *log.Logger, listenAddr string) ApplicationServer {
+// NewApplicationServer creates a new instance of ApplicationServer.
+func NewApplicationServer(logger *log.Logger, listenAddr string) *ApplicationServer {
 	// create webserver
 	router := http.NewServeMux()
 
 	// configure routes
 	router.HandleFunc("/", logCall(logger, welcome))
 
-	return ApplicationServer{
+	return &ApplicationServer{
 		Logger: logger,
 		Webserver: &http.Server{
 			Addr:         listenAddr,
@@ -35,6 +37,9 @@ func NewApplicationServer(logger *log.Logger, listenAddr string) ApplicationServ
 	}
 }
 
+// GracefullShutdown request that the webserver shuts down.
+// Server wait for the quit signal and cancels all current connections.
+// It pushes true to the done channel after finished shuting down.
 func (srv ApplicationServer) GracefullShutdown(quit <-chan os.Signal, done chan<- bool) {
 	<-quit
 	server := srv.Webserver
@@ -52,6 +57,9 @@ func (srv ApplicationServer) GracefullShutdown(quit <-chan os.Signal, done chan<
 	close(done)
 }
 
+// ListenAndServe instructs the webserver to listens on
+// the TCP network address srv.Addr and then
+// calls Serve to handle requests on incoming connections.
 func (srv ApplicationServer) ListenAndServe() error {
 	return srv.Webserver.ListenAndServe()
 }
