@@ -15,49 +15,53 @@ import (
 )
 
 var (
+	logFile    string = "logs/webserver.log"
 	listenAddr string = ":5000"
+	basePath   string = ""
 )
 
-func init() {
-	value, isSet := os.LookupEnv("LISTEN_ADDR")
-	if isSet {
+func main() {
+	// read arguments
+	if value, isSet := os.LookupEnv("LISTEN_ADDR"); isSet {
 		listenAddr = value
 	}
-
+	if value, isSet := os.LookupEnv("BASE_PATH"); isSet {
+		basePath = value
+	}
+	// cli arguments can override environment variables
 	flag.StringVar(&listenAddr, "listen-addr", listenAddr, "server listen address")
+	flag.StringVar(&basePath, "base-path", basePath, "base path to serve endpoints")
 	flag.Parse()
 
-	log.SetFlags(log.LstdFlags)
-	log.SetPrefix("http: ")
-	log.SetOutput(os.Stdout)
-
+	// prepare logging
+	log.SetPrefix("[APP] ")
 	log.SetOutput(
 		io.MultiWriter(
 			os.Stdout,
 			&lumberjack.Logger{
-				Filename:   "log/webserver.log",
+				Filename:   logFile,
 				MaxSize:    500, // megabytes
 				MaxBackups: 3,
 				MaxAge:     28, //days
 			},
 		),
 	)
-}
 
-func main() {
+	// prepare gracefull shutdown channel
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
-
 	signal.Notify(quit, os.Interrupt)
 
-	server := server.NewApplicationServer(log.Default(), listenAddr)
+	// create server
+	log.Println("main", "creating server")
+	server := server.NewApplicationServer(listenAddr, basePath)
 	go server.GracefullShutdown(quit, done)
 
-	log.Println("Server is ready to handle requests at", listenAddr)
+	// start listening
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Could not listen on %s: %v\n", listenAddr, err)
+		log.Fatalln("main", "could not start listening", err)
 	}
 
 	<-done
-	log.Println("Server stopped")
+	log.Println("main", "Server stopped")
 }
