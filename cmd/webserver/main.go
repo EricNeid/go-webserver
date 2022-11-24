@@ -4,7 +4,6 @@ package main
 
 import (
 	"flag"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +35,7 @@ func main() {
 	// prepare logging
 	log.SetPrefix("[APP] ")
 	log.SetOutput(
-		io.MultiWriter(
+		LazyMultiWriter(
 			os.Stdout,
 			&lumberjack.Logger{
 				Filename:   logFile,
