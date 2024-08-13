@@ -13,15 +13,14 @@ build-windows:
 		-w /app -v ${DIR}:/app \
 		${GO_IMAGE} \
 		go build -o ./out/ ./cmd/webserver/
-.PHONY: build-oddmatcher-windows
-build-oddmatcher-windows:
+.PHONY: build-linux
+build-linux:
 	docker run -it --rm \
-		-e GOOS=windows \
+		-e GOOS=linux \
 		-e GOARCH=amd64 \
 		-w /app -v ${DIR}:/app \
 		${GO_IMAGE} \
 		go build -o ./out/ ./cmd/webserver/
-
 
 
 .PHONY: cover
