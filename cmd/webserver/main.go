@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	logFile    string = "logs/webserver.log"
-	listenAddr string = ":5000"
-	basePath   string = ""
+	logFile    = "logs/webserver.log"
+	listenAddr = ":5000"
+	basePath   = ""
 )
 
 func main() {
@@ -39,25 +39,25 @@ func main() {
 			os.Stdout,
 			&lumberjack.Logger{
 				Filename:   logFile,
-				MaxSize:    500, // megabytes
+				MaxSize:    200, // megabytes
 				MaxBackups: 3,
-				MaxAge:     28, //days
+				MaxAge:     10, // days
 			},
 		),
 	)
 
-	// prepare gracefull shutdown channel
+	// prepare graceful shutdown channel
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 
 	// create server
 	log.Println("main", "creating server")
-	server := server.NewApplicationServer(listenAddr, basePath)
-	go server.GracefullShutdown(quit, done)
+	srv := server.NewApplicationServer(listenAddr, basePath)
+	go srv.GracefullShutdown(quit, done)
 
 	// start listening
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalln("main", "could not start listening", err)
 	}
 
