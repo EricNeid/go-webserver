@@ -8,21 +8,20 @@ LINTER_IMAGE := golangci/golangci-lint:v1.54-alpine
 .PHONY: build-windows
 build-windows:
 	docker run -it --rm \
-		-e CGO_ENABLED=0 \
 		-e GOOS=windows \
 		-e GOARCH=amd64 \
 		-w /app -v ${DIR}:/app \
-		${GO_IMAGE} \ \
+		${GO_IMAGE} \
 		go build -o ./out/ ./cmd/webserver/
-.PHONY: build-linux
-build-linux:
+.PHONY: build-oddmatcher-windows
+build-oddmatcher-windows:
 	docker run -it --rm \
-		-e CGO_ENABLED=0 \
-		-e GOOS=linux \
+		-e GOOS=windows \
 		-e GOARCH=amd64 \
 		-w /app -v ${DIR}:/app \
-		${GO_IMAGE} \ \
+		${GO_IMAGE} \
 		go build -o ./out/ ./cmd/webserver/
+
 
 
 .PHONY: cover
