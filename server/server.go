@@ -17,11 +17,16 @@ const timeFormat string = "Mon Jan 2 15:04:05 2006"
 
 // A ApplicationServer defines parameters and companions for running an HTTP server.
 type ApplicationServer struct {
+	basePath  string
+	Router    *http.ServeMux
 	Webserver *http.Server
 }
 
 // NewApplicationServer creates a new instance of ApplicationServer.
-func NewApplicationServer(listenAddr, basePath string) *ApplicationServer {
+func NewApplicationServer(
+	listenAddr,
+	basePath string,
+) *ApplicationServer {
 	log.Println("NewApplicationServer", "creating server", listenAddr, basePath)
 
 	// create webserver
@@ -32,6 +37,8 @@ func NewApplicationServer(listenAddr, basePath string) *ApplicationServer {
 	router.HandleFunc(base+"/", logCall(welcome))
 
 	return &ApplicationServer{
+		basePath: base,
+		Router:   router,
 		Webserver: &http.Server{
 			Addr:         listenAddr,
 			Handler:      router,
@@ -42,6 +49,13 @@ func NewApplicationServer(listenAddr, basePath string) *ApplicationServer {
 	}
 }
 
+// HandleFunc adds new handler for the given relative path. The configured base path is automatically prepended.
+func (srv *ApplicationServer) HandleFunc(relativePath string, handler func(http.ResponseWriter, *http.Request)) {
+	srv.Router.HandleFunc(srv.basePath+normalizePath(relativePath), handler)
+}
+
+// normalizePath ensures that path starts always with a leading slash and has no trailing slash.
+// The only exception occurs, when the path is empty. In that case an empty string is returned.
 func normalizePath(path string) string {
 	if path == "" {
 		return path

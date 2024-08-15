@@ -10,6 +10,7 @@ import (
 	"os/signal"
 
 	"github.com/EricNeid/go-webserver/server"
+	"github.com/EricNeid/go-webserver/writer"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -35,7 +36,7 @@ func main() {
 	// prepare logging
 	log.SetPrefix("[APP] ")
 	log.SetOutput(
-		LazyMultiWriter(
+		writer.LazyMultiWriter(
 			os.Stdout,
 			&lumberjack.Logger{
 				Filename:   logFile,
