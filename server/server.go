@@ -51,7 +51,7 @@ func NewApplicationServer(
 
 // HandleFunc adds new handler for the given relative path. The configured base path is automatically prepended.
 func (srv *ApplicationServer) HandleFunc(relativePath string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.Router.HandleFunc(srv.basePath+normalizePath(relativePath), handler)
+	srv.Router.HandleFunc(srv.basePath+normalizePath(relativePath), logCall(handler))
 }
 
 // normalizePath ensures that path starts always with a leading slash and has no trailing slash.
