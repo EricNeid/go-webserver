@@ -1,5 +1,26 @@
 // SPDX-FileCopyrightText: 2021 Eric Neidhardt
 // SPDX-License-Identifier: MIT
+
+/*
+package writer contains a simple multi writer that is intended to be used with lumberjack.
+This writer does not fail if write to a single writer fails.
+
+Example:
+
+log.SetOutput(
+
+	writer.LazyMultiWriter(
+		os.Stdout,
+		&lumberjack.Logger{
+			Filename:   logFile,
+			MaxSize:    200, // megabytes
+			MaxBackups: 3,
+			MaxAge:     10, // days
+		},
+	),
+
+)
+*/
 package writer
 
 import "io"
