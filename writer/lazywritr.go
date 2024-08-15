@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 /*
-package writer contains a simple multi writer that is intended to be used with lumberjack.
+Package writer contains a simple multi writer that is intended to be used with lumberjack.
 This writer does not fail if write to a single writer fails.
 
 Example:
